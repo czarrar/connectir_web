@@ -1,0 +1,9 @@
+---
+layout: base
+title: documentation
+---
+
+h1. Documentation
+
+Currently there is only documentation available on the command-line scripts for executing connectome-wide association studies using an MDMR(Multivariate Distance Matrix Regression)-based approach. Documentation on the specific R-functions and additional connectivity analyses will be forthcoming.
+

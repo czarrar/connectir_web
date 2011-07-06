@@ -1,0 +1,72 @@
+---
+layout: base
+title: download
+---
+
+h1. Download
+
+You will first need to install a version of R (see below), followed by several dependent R-packages, and finally the connectir R-package.
+
+h2. R
+
+<div class="prepend-1">
+
+h3. Windows
+
+If you have Windows, please contact me. I am not sure what the exact installation instructions would be for Windows but it should be possible.
+
+h3. Redhat and CentOS
+
+Install the "academic version of Revolution R":http://www.revolutionanalytics.com/downloads/free-academic.php. This version of R is compiled with Intel's MKL, which provides parallel processing for matrix algebra operations even speeds up matrix algebra for one processor.
+
+h3. Debian and Ubuntu
+
+Revolution R should be available through your package manager.
+
+h3. Other Versions of Linux
+
+Install the "standard version of R":http://cran.r-project.org/mirrors.html.
+
+h3. MacOSX
+
+Install the "standard version of R":http://cran.r-project.org/mirrors.html. Maybe someone can confirm this: on older versions of OSX (pre Snow Leopard) you can open the application 'R' or 'R64' with the former being a 32-bit version of R. Make sure that you open the 64-bit version of R. In later versions, both applications are the 64-bit version of R.
+
+</div>
+
+h2. Package Dependencies
+
+Open up the terminal and open R or Revo64 or R64, depending on your system. Now enter the following commands in the R prompt.
+
+{% highlight r %}
+install.packages(c("foreach", "doMC", "multicore", "getopt", "optparse"))
+install.packages("plyr", dependencies=TRUE)
+install.packages(c("Rcpp", "RcppArmadillo", "inline"), dependencies=TRUE)
+install.packages(c("bigmemory", "biganalytics"), \
+	repos="http://R-Forge.R-project.org")
+{% endhighlight %}
+
+<div class="prepend-1">
+
+h3. Redhat, CentOS, Debian, Ubuntu, and MacOSX
+
+Install bigalgebra as you did the other packages.
+
+
+h3. All Other Systems
+
+You will need to first install the Intel MKL library. A free academic version is available for linux systems.
+
+</div>
+
+
+h2. Connectir and Related Packages
+
+I am developing connectir and 2 related packages (niftir and big.extensions). You can install all 3 as follows:
+
+
+
+
+
+
+
+

@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+jekyll && rsync -avz --delete _site/ czarrar:/home/groups/connectir/htdocs

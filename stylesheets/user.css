@@ -1,0 +1,118 @@
+.shadow {
+	padding: 20px;
+	border: 1px solid #f0f0f0;
+	border-bottom: 2px solid #ccc;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}
+
+body {
+    font-family: "Lucida Grande",Verdana,Helvetica,Arial,sans-serif;
+}
+
+#header {
+    background: #172322;
+    padding: 1em 0 0.5em 1.5em;
+    border-bottom:thin solid gray;
+}
+
+#subheader {
+    margin-bottom: 3em;
+}
+
+#connectir {
+    color: white;
+    font-size: 1.5em;
+    font-variant: small-caps;
+    text-transform: lowercase;
+    font-weight:bold;
+}
+
+
+/* Headers */
+
+h1, h2, h3, h4, h5, h6 { 
+  font-family: "Century Gothic", sans-serif;
+  color: #444; 
+}
+
+h1 { border-bottom: thin solid gray; margin-top: 1.5em; margin-bottom: 0.25em }
+
+h1:first-child { margin-top: 0; }
+
+h2 { border-bottom: thin solid gray; margin-top: 1.25em; margin-bottom: 0.5em; font-weight: bold; }
+
+h2:first-child { margin-top: 0.5em; }
+
+h3 { border-bottom: thin dotted gray; margin-top: 1.5em; margin-bottom: 0.75em; }
+
+/* TOC */
+ol#toc {
+  font: italic 1.2em Georgia, Times, serif;
+  color: #999999;
+  margin-left: -0.25em;
+}
+ol#toc li {
+  padding-top: 0.2em;
+  padding-bottom: 0.2em;
+}
+ol#toc a {
+  font: normal 0.9em "Lucida Grande",Verdana,Helvetica,Arial,sans-serif;
+  color: #000000;
+  text-decoration: none;
+}
+ol#toc a:hover {
+  color: #0080FF;
+}
+
+
+/* Highlighting */
+
+div .highlight {
+    font-size: 10pt;
+    padding: 5px;
+    padding-right: 10px;
+    padding-left: 10px;
+    margin: 5px;
+    margin-top: 20px;
+    margin-bottom: 30px;
+    box-shadow: 5px 5px 5px #888;
+    -webkit-box-shadow: 5px 5px 5px #888;
+    -moz-box-shadow: 5px 5px 5px #888;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+}
+
+/* Messages */
+
+.info, .success, .warning, .error, .validation {
+    border: 1px solid;
+    margin: 10px 0px;
+    padding:15px 10px 15px 50px;
+    background-repeat: no-repeat;
+    background-position: 10px center;
+}
+.info {
+    color: #00529B;
+    background-color: #BDE5F8;
+    background-image: url('/images/knob/Knob Info.png');
+}
+.success {
+    color: #4F8A10;
+    background-color: #DFF2BF;
+    background-image:url('/images/knob/Knob Valid Green.png');
+}
+.warning {
+    color: #9F6000;
+    background-color: #FEEFB3;
+    background-image: url('/images/knob/Knob Attention.png');
+}
+.error {
+    color: #D8000C;
+    background-color: #FFBABA;
+    background-image: url('/images/knob/Knob Cancel.png');
+}
+
+

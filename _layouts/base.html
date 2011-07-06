@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<title>connectir &raquo; {{ page.title }}</title>
+		<meta name="author" content="Zarrar Shehzad" />
+		
+		<script src="/js/jquery.js" type="text/javascript"></script>
+		<script src="/js/jquery.tableofcontents.min.js" type="text/javascript" charset="utf-8"></script>
+		
+		<script type="text/javascript" charset="utf-8">
+		    $(document).ready(function(){
+		        $("#toc").tableOfContents();
+		    });
+				
+				$("div.highlight").hover(function() {
+				        $(this).animate({ width: "765px"}, 250);
+				    }, function() {
+				        $(this).animate({ width: "437px" }, 250);
+				});
+		</script>
+		
+		<link href='http://fonts.googleapis.com/css?family=Reenie+Beanie&amp;subset=latin' rel='stylesheet' type='text/css'>
+		
+		<!-- From blueprint css -->
+		<link rel="stylesheet" href="/stylesheets/screen.css" type="text/css" media="screen, projection" />  
+		<link rel="stylesheet" href="/stylesheets/print.css" type="text/css" media="print" />  
+		<!--[if IE]>
+			<link rel="stylesheet" href="/stylesheets/ie.css" type="text/css" media="screen, projection" />
+		<![endif]-->
+		<link rel="stylesheet" href="/stylesheets/fancy-type/screen.css" type="text/css" media="screen, projection" />
+		
+		<!-- code highlighting -->
+		<link rel="stylesheet" href="/stylesheets/highlighting/monokai.css" type="text/css" media="screen, projection" />
+		
+		
+		<!-- drop down stuff -->
+		<link href="/stylesheets/dropdown/dropdown.css" media="screen" rel="stylesheet" type="text/css" />
+		<link href="/stylesheets/dropdown/themes/vimeo.com/default.advanced.css" media="screen" rel="stylesheet" type="text/css" />
+		<!--[if lte IE 7]>
+		<script type="text/javascript" src="/js/jquery.dropdown.js"></script>
+		<![endif]-->
+		
+		<!-- customizations -->
+		<link rel="stylesheet" href="/stylesheets/user.css" type="text/css" media="screen, projection" />
+		
+		<!-- google analytics -->
+		{% unless site.google_search_api_key == nil or site.google_search_api_key == empty %}
+		  <script src="http://www.google.com/jsapi?key={{site.google_search_api_key}}" type="text/javascript"></script>
+			<script language="Javascript" type="text/javascript">
+	    //<![CDATA[
+		    google.load("search", "1");
+
+		    function OnLoad() {
+		      // Create a search control
+		      var searchControl = new google.search.SearchControl();
+
+		      // Add in a full set of searchers
+		      var webSearch = new google.search.WebSearch();
+					webSearch.setSiteRestriction("http://connectir.projects.nirts.org")
+		      searchControl.addSearcher(webSearch);
+					
+		      // Tell the searcher to draw itself and tell it where to attach
+		      searchControl.draw(document.getElementById("searchcontrol"));
+		    }
+		    google.setOnLoadCallback(OnLoad);
+	    //]]>
+	    </script>
+			<link rel="stylesheet" href="/stylesheets/gsearch.css" type="text/css" media="screen, projection" />
+		{% endunless %}
+		
+	</head>
+	<body>
+    <div class="container">
+			<div id="header" class="span-24">
+				<div id="connectir">
+					connectir<span class="alt"> : Another brain connectivity toolbox</span>
+				</div>
+			</div>
+			<div id="subheader" class="span-24">
+				<ul id="nav" class="dropdown dropdown-horizontal">
+					<li class="first"><a href="/">Home</a></li>
+					<li><a href="/download">Download</a></li>
+					<li><a href="/doc">Documentation</a>
+						<ul>
+							<li class="first last"><a href="/doc/cwas">CWAS</a></li>
+						</ul>
+					</li>
+					<li><a href="/pub">Publications</a></li>
+					<li><a href="/faq">FAQ</a></li>
+					<li class="last"><a href="/contact">Contact</a></li>
+					
+					<!-- TODO SEARCH 
+					<li class="dir last">
+						<form method="post" action="">
+							<fieldset class="f-search">
+								<label for="search">Search:</label>
+								<input type="text" id="search" class="text" value="Search me!" onfocus="if (this.value == 'Search me!') this.value = '';" onblur="if (this.value == '') this.value = 'Search me!';" maxlength="255" />
+								<input type="image" src="/stylesheets/dropdown/themes/vimeo.com/images/btn_search.png" class="button" />
+							</fieldset>
+						</form>
+					</li>
+					-->
+					
+				</ul>
+			</div>
+			
+			<div class="span-17 colborder" id="content">
+	    	{{ content }}
+	    </div>
+
+	    <div class="span-6 last" id="sidebar">
+				<div id="searchcontrol">Loading...</div>
+				<div id="meta-toc" style="margin-top:3.5em">
+	        <h4 class="caps">Table of Contents</h3>
+	        <div class="box">
+						<ol id="toc"></ol>
+	        </div>
+	      </div>
+	      <div id="quick-links" style="margin-top:4em;">
+	        <h4 class="caps">Quick Links</h3>
+	        <div class="box">
+	          <a href="#" class="quiet">Hygiene</a>
+	          <div class="quiet">Nov. 29, 2008</div>
+	          <div class="quiet">by Craven</div>
+						<div class="queit">TODO: github, mailing list, my contact info, Rforge</div>
+	        </div>
+	      </div>
+	    </div>
+			
+    	<hr />
+
+			<div class="span-24 footer quiet" align="center">
+				<p class="append-3 prepend-3">
+					Content and data on this wiki is available under a <a href="http://creativecommons.org/licenses/by-nc/3.0">CC Attribution-Noncommercial 3.0 Unported license</a>
+				<br />
+					&copy; 2011 Zarrar Shehzad. 
+					Some rights reserved.
+				</p>
+			</div>
+		</div>
+		{% unless site.ga_id == nil or site.ga_id == empty %}
+		<script type="text/javascript">
+			<script type="text/javascript">
+
+			  var _gaq = _gaq || [];
+			  _gaq.push(['_setAccount', '{{site.ga_id}}']);
+			  _gaq.push(['_trackPageview']);
+
+			  (function() {
+			    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+			    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+			    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+			  })();
+
+			</script>		
+		{% endunless %}
+	</body>
+</html>

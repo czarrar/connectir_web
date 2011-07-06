@@ -1,0 +1,31 @@
+---
+layout: base
+title: about
+---
+
+h1. Getting started with Jekyll
+
+I am not afraid of the command line
+
+<div class="prepend-1">
+
+h2. testing something
+
+something else
+
+h3. hey there
+
+jack black
+
+h2. test 2
+
+something else
+
+</div>
+
+h1. Jack
+
+h2. Black
+
+h1. Trades
+
