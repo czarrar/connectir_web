@@ -1,0 +1,175 @@
+---
+layout: base
+title: connectir_subdist
+fixemdash: true
+comments: true
+---
+
+
+h1. connectir_subdist
+
+This is a command-line script that is the first step for CWAS. To get the usage and help, you can simply enter 'connectir_subdist' on the command-line and press enter. This wiki page will go into a bit more detail about the script and its usage relative to the command-line help.
+
+h2. Overview
+
+To give an overview of this script, imagine that we are analyzing 4D functional data from 20 healthy controls and 20 individuals with schizophrenia. This script will then do the following with these 40 functional images as input:
+
+# For each participant's functional data, a connectivity map will be computed at each voxel in the brain. Usually, the connectivity map will be a correlation between one voxel with every other voxel in the brain.
+# For each voxel's connectivity map, a distance or similarity metric will be calculated between every possible pair of participants. Usually, the distance matrix will be 1 minus the correlation between a pair of participant connectivity maps.
+
+For each voxel in this example, the result will be a 40 x 40 matrix representing how dissimilar pairs of participant connectivity maps are from each other. In the next script ("connectir_mdmr":/doc/cwas/mdmr), we will quantify how well the information in this 40 x 40 matrix distinguishes healthy controls from individuals with schizophrenia.
+
+h2. Usage
+
+{% highlight bash %}
+connectir_subdist [options] -i input_functional_list -m input_mask_list  output-directory
+{% endhighlight %}
+
+h2. Simplest. Example. Ever.
+
+To get you familiar with the required inputs, below is an example usage with only the required arguments/options.
+
+{% highlight bash %}
+connectir_subdist \
+	-i functional_paths.txt \
+	-m mask_paths.txt \
+	subdist_output
+{% endhighlight %}
+
+Let's go through this command:
+
+h3. -i functional_paths.txt
+
+This should be a text file with each line containing the full path to one 4D functional image. Ideally, this should be completely preprocessed (e.g., motion corrected, all nuisance covariates regressed out) and registered to some kind-of standard space that is the same for every 4D image. I have currently been registering all of my functional images to 4x4x4mm MNI152 standard space.
+
+Here is an example listing resting-state scans from 4 participants:
+
+bq.. /path/to/subjects/sub2001/rest/preproc2standard_4mm.nii.gz
+/path/to/subjects/sub2002/rest/preproc2standard_4mm.nii.gz
+/path/to/subjects/sub2003/rest/preproc2standard_4mm.nii.gz
+/path/to/subjects/sub2004/rest/preproc2standard_4mm.nii.gz
+
+h3. -m mask_paths.txt
+
+This should be a text file with each line containing the full path to one 3D mask. The script will take these masks and find the voxels that overlap across all of them. Only those voxels that overlap will be used from the functional images given with the '-i' option.
+
+The files here should correspond to the files given with the '-i' option. That is, the file indicated in the 3rd line of this mask_paths.txt should correspond to the same subject/condition as the functional image indicated in the 3rd line of  functional_paths.txt. Also like the functional images, these masks should be registered to the same kind-of standard space. 
+
+Here is an example listing brain masks from 4 participants (importantly in the same order as the example functional_paths.txt file):
+
+bq.. /path/to/subjects/sub2001/rest/mask2standard_4mm.nii.gz
+/path/to/subjects/sub2002/rest/mask2standard_4mm.nii.gz
+/path/to/subjects/sub2003/rest/mask2standard_4mm.nii.gz
+/path/to/subjects/sub2004/rest/mask2standard_4mm.nii.gz
+
+p(info). These masks don't have to cover the whole brain. If for whatever reason, you wanted something more restrictive then that is also possible. However, remember that if there is no overlap for the masks across participants, then there will be no voxel to use for the analyses.
+
+h3. subdist_output
+
+This is the last thing in our command and indicates the directory that we will use as our output.
+
+
+h2. Options
+
+Below are different options given in some semi-order of personal usefulness.
+
+h3. --ztransform
+
+Perform Fischer Z-Transform of correlations (i.e., functional connectivity for an individual participant) before calculating the distance between participants.
+
+*Default*: Will not do a ztransform.
+
+h3. --memlimit=NUMBER
+
+This is used to set the maximum amount of RAM (in GBs) that the script can use in doing its amazing feats. The script will give an error if this limit is _expected_ to be exceeded. There is no guarantee that this limit won't be exceeded...just that it shouldn't be exceeded.
+
+Increasing the memory limit, will allow more voxels to be processed at once and will automatically change the blocksize option (see below). 
+
+*Default*: 6 GB
+
+h3. --blocksize=NUMBER
+
+When the correlation maps are computed for each subject, they are usually calculated for chunks of voxels. This option allows you to set the number of voxels that compose that chunk. A value of 0 means that the script will try to automatically figure out the number of voxels to chunk over based on the RAM limit specified with --memlimit
+
+*Default*: 0 (i.e., automatically set)
+
+h3. -c NUMBER --cores=NUMBER
+
+The number of computer processors to use in parallel. Each processor will compute connectivity maps and distances between participant connectivity maps for a *different* set of voxels. _Note_: If you manually specify the --blocksize, then using more processors with this option will use more memory.
+
+*Default*: 1
+
+h3. -t NUMBER or --threads=NUMBER
+
+The number of computer processors to use in parallel for Intel's Math Kernel Library (MKL). This is slightly different since this specifies the number of processors that will be used for matrix algebra operations. In this case, for the *same* set of voxels, multiple processors will be used to compute connectivity and distances between participant connectivity maps. _Note_: Unlike the -c or --cores, if you you manually specify the --blocksize, then using more processors with this option will not use more memory.
+
+I am not sure which option (--cores or --threads) will lead to better performance. I usually use a mix of both (e.g., --cores=2 --threads=2). *If you do a speed comparison, please let me know.*
+
+*Default*: 1
+
+p(info). You must have Intel's MKL installed on your machine and also the bigalgebra R package configured to work with Intel's MKL. If you installed bigalgebra with Revolution R, then you should be fine. There are considerable performance gains by using this library even for 1 processor.
+
+h3. --brainmask=FILE
+
+When computing connectivity maps for each voxel, you can specify an additional mask (on top of what is given with the -m option) that further restricts the voxels considered. This mask must be in the same space as those specified with the -m option. For instance, I often use a gray matter mask based on priors given with FSL. _Note_: voxels that overlap between this mask and all those given with the '-m' option will be used.
+
+*Default*: Nothing.
+
+h3. --seedmask=FILE
+
+You cannot specify this option without first specifying the --brainmask option. This option allows you to restrict which voxel's will have connectivity maps computed (where the --brainmask option specifies which voxels are part of the connectivity map).
+
+*Default*: If brainmask is specified then it will be used. Otherwise nothing.
+
+p(info). This mask can be a subset of those in --brainmask but cannot contain any voxels that are not present in --brainmask.
+
+
+h3. --overwrite
+
+*THIS OPTION DOES NOT CURRENTLY WORK*. That means if the script finds that the output directory already exists, it will quit and you must manually remove the output before continuing.
+
+h3. -v or --verbose
+
+Print extra output
+
+*Default*: Yes please.
+
+h3. -q or --quiet
+
+Print minimal output
+
+h3. -h or --help
+
+Show the help message and exit
+
+
+h2. Structure of Output
+
+The following are different files or directories in the output directory after running connectir_subdist.
+
+h3. input_funcs
+
+Directory that has soft links to all the files given with the -i option.
+
+h3. input_masks
+
+Directory that has various masks, including:
+
+* *preseedmask.nii.gz*: If you specified a seedmask, then this is that.
+* *prebrainmask.nii.gz*: If you specified a brainmask, then this is that.
+* *maskoverlap.nii.gz*: This is the overlap across all the masks given with -m option.
+* *seedmask.nii.gz*: The overlap across the preseedmask and maskoverlap.
+* *brainmask.nii.gz*: The overlap across the prebrainmask and maskoverlap files.
+
+h3. subdist.desc & subdist.bin
+
+The .desc file contains header information and the .bin file contains distance matrices for each voxel. You can load this in R using the _attach.big.matrix_ function in R (from the bigmemory package).
+
+h3. subdist_gower.desc & subdist_gower.bin
+
+These files also represent distance matrices for each voxel but the distance matrices have been centered around the origin (i.e., the sum of each distance matrix equals 0).
+
+h3. standard_2mm.nii.gz & standard_4mm.nii.gz
+
+2x2x2mm and 4x4x4mm MNI152 brains.
+

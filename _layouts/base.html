@@ -13,11 +13,24 @@
 		        $("#toc").tableOfContents();
 		    });
 				
-				$("div.highlight").hover(function() {
-				        $(this).animate({ width: "765px"}, 250);
-				    }, function() {
-				        $(this).animate({ width: "437px" }, 250);
+				{% if page.fixemdash %}
+				// Replace the em dash with --
+				$(document).ready(function() {
+					$("h3,p").each(function() {
+						$(this).html($(this).html().replace(/\u2014/g, "--"));
+					});
 				});
+				{% endif %}
+				
+				function get_address() {
+					var a = new Array('.shehzad', 'om','mail.c','zarrar', '@g');
+					return a[3]+a[0]+a[4]+a[2]+a[1];
+				}
+				
+				// Obfuscation
+				$(document).ready(function() {
+					$(".zmail").append(" <a href='mailto:"+get_address()+"'>"+get_address()+"</a>")
+				})
 		</script>
 		
 		<link href='http://fonts.googleapis.com/css?family=Reenie+Beanie&amp;subset=latin' rel='stylesheet' type='text/css'>
@@ -44,7 +57,7 @@
 		<!-- customizations -->
 		<link rel="stylesheet" href="/stylesheets/user.css" type="text/css" media="screen, projection" />
 		
-		<!-- google analytics -->
+		<!-- google search -->
 		{% unless site.google_search_api_key == nil or site.google_search_api_key == empty %}
 		  <script src="http://www.google.com/jsapi?key={{site.google_search_api_key}}" type="text/javascript"></script>
 			<script language="Javascript" type="text/javascript">
@@ -83,7 +96,14 @@
 					<li><a href="/download">Download</a></li>
 					<li><a href="/doc">Documentation</a>
 						<ul>
-							<li class="first last"><a href="/doc/cwas">CWAS</a></li>
+							<li class="first"><a href="/doc/cwas">CWAS</a>
+								<ul>
+									<li class="first"><a href="/doc/cwas/subdist">subdist</a></li>
+									<li><a href="/doc/cwas/mdmr">mdmr</a></li>
+									<li class="last"><a href="/doc/cwas/examples">examples</a></li>
+								</ul>
+							</li>
+							<li class="last"><a href="/#">More?</a></li>
 						</ul>
 					</li>
 					<li><a href="/pub">Publications</a></li>
@@ -107,8 +127,26 @@
 			
 			<div class="span-17 colborder" id="content">
 	    	{{ content }}
-	    </div>
-
+			
+		  {% if page.comments %}
+			<hr />
+					<div id="disqus_thread"></div>
+				
+					<script
+					   type="text/javascript"
+					   src="http://connectir.disqus.com/embed.js">
+					</script>
+					<noscript>
+					  Please enable Javascript to <a href="http://connectir.disqus.com/?url=ref">view the discussion thread.</a>
+					</noscript>
+					<p>
+						<a href="http://disqus.com" class="dsq-brlink">
+						  blog comments powered by <span class="logo-disqus">Disqus</span>
+						</a>
+					</p>
+			{% endif %}
+		</div>
+		
 	    <div class="span-6 last" id="sidebar">
 				<div id="searchcontrol">Loading...</div>
 				<div id="meta-toc" style="margin-top:3.5em">
@@ -120,10 +158,14 @@
 	      <div id="quick-links" style="margin-top:4em;">
 	        <h4 class="caps">Quick Links</h3>
 	        <div class="box">
-	          <a href="#" class="quiet">Hygiene</a>
-	          <div class="quiet">Nov. 29, 2008</div>
-	          <div class="quiet">by Craven</div>
-						<div class="queit">TODO: github, mailing list, my contact info, Rforge</div>
+						<a href="https://github.com/czarrar/connectir_web" class="quiet">Website Github Repository</a>
+						<br />
+						<a href="https://r-forge.r-project.org/projects/niftir" class="quiet">Rforge Repository</a>
+						<br />
+						<a href="http://groups.google.com/group/connectir" class="quiet">Mailing List</a>
+						<br />
+						<a href="" class="quiet" onclick="">Email for Help</a>
+						<br />
 	        </div>
 	      </div>
 	    </div>
@@ -140,9 +182,8 @@
 			</div>
 		</div>
 		{% unless site.ga_id == nil or site.ga_id == empty %}
+		<!-- google analytics -->
 		<script type="text/javascript">
-			<script type="text/javascript">
-
 			  var _gaq = _gaq || [];
 			  _gaq.push(['_setAccount', '{{site.ga_id}}']);
 			  _gaq.push(['_trackPageview']);
@@ -152,7 +193,6 @@
 			    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
 			    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 			  })();
-
 			</script>		
 		{% endunless %}
 	</body>

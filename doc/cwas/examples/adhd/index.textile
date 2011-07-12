@@ -1,0 +1,79 @@
+---
+layout: base
+title: CWAS - ADHD
+fixemdash: true
+comments: true
+---
+
+h1. ADHD
+
+Here, we were interested in discovering brain regions whose connectivity patterns differed between 37 typically developing children (TDC) and 37 children with ADHD[1] [2].
+
+p(info). We will not cover all the options for the CWAS commands here, instead please refer to the "CWAS of Age":/doc/cwas/examples/age for a more detailed walk-through.
+
+h2. Subdist
+
+{% highlight bash %}
+connectir_subdist \
+	-c 2 \
+	-t 2 \
+	--memlimit 8 \
+	--ztransform \
+	-i adhd_funclist.txt \
+	--brainmask gray_4mm_thr25.nii.gz \
+	-m adhd_masklist.txt \
+	adhd_subdist
+{% endhighlight %}
+
+h3. -i "adhd_funclist.txt":adhd_funclist.txt
+
+Each line in this "file":adhd_funclist.txt corresponds to one participant's pre-processed data in standard space (4x4x4mm).
+
+h3. -m "adhd_masklist.txt":adhd_masklist.txt
+
+Each line in this "file":adhd_masklist.txt corresponds to one participant's brain mask (i.e., voxels that have non-zero values in the functional data). The number and order of participant's data in this file is the same as in "adhd_funclist.txt":adhd_funclist.txt.
+
+h3. adhd_subdist
+
+The output directory for this script.
+
+h2. MDMR
+
+{% highlight bash %}
+connectir_mdmr \
+	-c 2 \
+	-t 2 \
+	--memlimit 8 \
+	-i adhd_subdist \
+	-m adhd_model.csv \
+	-p 9999 \
+	-f "Group + Age + Gender + Eyes" \
+	--factors2perm Group \
+	mdmr_output
+{% endhighlight %}
+
+h3. -i adhd_subdist
+
+Input directory (i.e., the output specified with connectir_subdist).
+
+h3. -m "adhd_model.csv":adhd_model.csv
+
+"Comma-separated file":adhd_model.csv with information about ADHD diagnostic status, age, gender, and resting scan instructions (eyes open or closed) for each participant. The first line is a header and specifies the name for each column. Each subsequent line contains information for one participant and the order of the participants is the same as "adhd_funclist.txt":adhd_funclist.txt and "adhd_masklist.txt":adhd_masklist.txt, which were specified with the -i and -m options (respectively) in connectir_subdist.
+
+h3. -f "Group + Age + Gender + Eyes"
+
+See how well ADHD diagnostic status, age, gender, and scan instructions (independently) explain the distances between participants. Note that we will only be determining the significance of the relationship between group membership (ADHD versus control) and distances (see --factors2perm below) while controlling for age, gender, and scan instructions.
+
+h3. --factors2perm Group
+
+Calculate significance for ADHD group membership (and not for the other factors specified with the -f option). This implies that at each voxel, we will be testing how well that voxel's pattern of whole-brain connectivity distinguishes ADHD participants from Control participants.
+
+h3. mdmr_output
+
+Output for this analysis. Note that this directory will be put inside the adhd_subdist directory so you cannot specify an absolute path here.
+
+h2. Footnotes
+
+fn1. "International Neuroimaging Data-Sharing Initiative":http://fcon_1000.projects.nitrc.org
+
+fn2. Shehzad Z, Kelly C, Reiss PT, Emerson JW, McMahon K, Copland DA, Castellanos FX, Milham MP. An Analytic Framework for Connectome-Wide Association Studies. Submitted.

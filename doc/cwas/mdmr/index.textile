@@ -1,0 +1,149 @@
+---
+layout: base
+title: connectir_mdmr
+fixemdash: true
+comments: true
+---
+
+h1. connectir_mdmr
+
+This is a command-line script that is the second step for CWAS. It is assumed that you have already run "connectir_subdist":/doc/cwas/subdist. To get the usage and help, you can simply enter connectir_mdmr on the command-line and press enter. This page will go into a bit more detail about this script and its usage than the command-line help.
+
+h2. Overview
+
+The MDMR analysis is akin to an ANOVA or F-test and applied to connectivity, it calculates the main effect of how much patterns of connectivity are predicted by a phenotypic variable. For instance, imagine that you are assessing the difference in connectivity between 20 healthy controls and 20 individuals with schizophrenia. You have already run "connectir_subdist":/doc/cwas/subdist that compares the similarity of each voxel's connectivity map between all possible pair of participants. In this case, at each voxel we will have a 40 x 40 matrix, where the ith row and jth column represent the similarity between the connectivity map for participant i versus participant j. If a voxel's connectivity map significantly differentiates our two groups (controls vs schizophrenia), then we would expect that the connectivity maps would be highly similar within each group but not very similar between groups. The MDMR analysis formalizes this intuitive distinction.
+
+p(info). I have mentioned how we compare the *similarity* between participant connectivity maps, since it is simpler to explain the method this way. However, in reality, we examine the *distance* between participant connectivity maps, which is simply the inverse of similarity.
+
+The result of the analysis is a 3D statistical map for each phenotypic variable (e.g., group difference between controls and individuals with schizophrenia). The value at each voxel reflects the degree to which a phenotypic variable predicts differences in that voxel's connectivity map (i.e., its pattern of connectivity).
+
+p(info). You don't need to only compare connectivity patterns between participants. You can also compare them within participants such as when examining changes in connectivity from rest to task. If you are interested in these types of designs, there is an example usage below applied to a within-subject design.
+
+h2. Usage
+
+{% highlight bash %}
+connectir_mdmr [options] -i input_subdist_directory -m info -f formula output_directory
+{% endhighlight %}
+
+h2. Simplest. Example. Ever.
+
+To get you familiar with the required inputs, below is an example usage with only the required arguments/options.
+
+{% highlight bash %}
+connectir_mdmr \
+	-i subdist_directory \
+	-m model.csv \
+	-f "group + age + group:age" \
+	mdmr_output
+{% endhighlight %}
+
+Let's go through this command:
+
+h3. -i subdist_directory
+
+This is the output directory of the "connectir_subdist":/doc/cwas/subdist command. This script will check to make sure everything that it needs is in this directory.
+
+h3. -m model.csv
+
+The _model.csv_ must be a comma-separated file, containing information about variables of interest or covariates. Each row of this file must correspond to the rows in the file with the list of functional images given to "connectir_subdist":/doc/cwas/subdist. For instance, if your input to the "connectir_subdist":/doc/cwas/subdist script was:
+
+bq.. /path/to/subjects/sub2001/rest/preproc2standard_4mm.nii.gz
+/path/to/subjects/sub2002/rest/preproc2standard_4mm.nii.gz
+/path/to/subjects/sub2003/rest/preproc2standard_4mm.nii.gz
+/path/to/subjects/sub2004/rest/preproc2standard_4mm.nii.gz
+
+p. Then the content of your _model.csv_ could be (note the order of participants):
+
+bq.. subject_id,group,age
+sub2001,control,28
+sub2002,control,22
+sub2003,schizophrenia,21
+sub2004,schizophrenia,29
+
+p. In the example above, there are three columns that correspond to each participant's:
+
+# Unique subject IDs
+# Group membership
+# Age
+
+h3. -f "group + age + group:age"
+
+This program makes use of R's formula interface for regression models. Each element in this mathematical expression should correspond to a column in your _info.csv_ file. Here, we are modeling 3 variables/factors. The "+" operator indicates that we want to consider more than one independent variables. The ":" operator represents an interaction between 2 or more variables. In this case, it is the interaction between group membership and age. For more information on this formula syntax "click here":#R_Formula_Syntax. Also see the "examples page":/doc/cwas/examples.
+
+h3. mdmr_output
+
+A directory that will serve as the output for the CWAS analysis using MDMR. The path for this directory will be within the input subdist directory.
+
+
+h2. Options
+
+Below are additional options: 
+
+h3. --usesubs=TEXT-FILE
+
+Filename with a list of subject indices to use from the subject distance matrices, allows you to select certain rows in your specified text file: selecting certain subjects for use. (**default** is to use all of them)
+
+h3. --expr=expression
+
+Allows you to specify a variable that takes the information from one column header in the model.csv file. This allows you to select groups and subsets of your subjects so that you don't have to recompute each time you want to look at different comparisons. 
+
+h3. --strata=NAME
+
+This option allows you to specify the name of a column in your '--model' that indicates certain group(s) and compute permutations within that selected group. This option is particularly useful for within-subjects designs, allowing you to shuffle within participants, across conditions. 
+
+h3. -p NUMBER, --permutations=NUMBER
+
+This option allows you to indicate the number of permutations to conduct (and therefore, display p values for) per voxel. Therefore, you can select which p values you want to view, so you can specify which factors are variables of interest and which are not. You can tell it to retrieve the main effect p values for just one group, or certain conditions, and so forth, while still using the others a covariates of no interest.  [*default*: 4999] 
+
+h3. --factors2perm=LIST
+
+A list of factors that you want to permute and calculate the p-value for. This would be similar to 'contrasts' in a regression analysis whereas the -m / --model option would be similar to 'regressors' or 'explanatory variables' in a regression analysis. The list must be comma-separated with no spaces in between (e.g., "group,age,gender").
+
+h3. -c NUMBER or --cores=NUMBER
+
+The number of computer processors to use in parallel. Each processor will compute connectivity maps and distances between participant connectivity maps for a *different* set of voxels. _Note_: If you manually specify the --blocksize, then using more processors with this option will use more memory.
+
+*Default*: 1
+
+h3. -t NUMBER or --threads=NUMBER
+
+The number of computer processors to use in parallel for Intel's Math Kernel Library (MKL). This is slightly different since this specifies the number of processors that will be used for matrix algebra operations. In this case, for the *same* set of voxels, multiple processors will be used to compute connectivity and distances between participant connectivity maps. _Note_: Unlike the -c or --cores, if you you manually specify the --blocksize, then using more processors with this option will not use more memory.
+
+I am not sure which option (--cores or --threads) will lead to better performance. I usually use a mix of both (e.g., --cores=2 --threads=2). *If you do a speed comparison, please let me know.*
+
+*Default*: 1
+
+h3. --blocksize=NUMBER
+
+How many sets of voxels should used in each iteration of computing the pseudo F-statistics (0 = auto) [default: 0]
+
+h3. --memlimit=NUMBER
+
+If blocksize is set to auto (--blocksize=0), then will set the blocksize to use a maximum of RAM specified by this option  [default: 6]
+
+h3. --overwrite
+
+Overwrite output if it already exists (default is not to overwrite already existing output)
+
+h3. -v, --verbose
+
+Print extra output [default]
+
+h3. -q, --quiet
+
+Print less output
+
+h3. mdmr_output
+
+A directory that will serve as the output for the CWAS analysis using MDMR. The path for this directory will be within the input subdist directory.
+
+
+h2. R Formula Syntax
+
+R uses a special syntax to specify statistical models. The model formula syntax is used in many different functions, even when a statistical model is not implied. Normally, R uses the form _*response ~ predictor(s)*_. For our CWAS application, we have a 'response' for each voxel that is a matrix comparing that the similarity of that voxel's connectivity pattern between every possible pair of participants. This response is assumed so you don't need to specify it with the -f formula option. Instead, you only need to give a list of predictor variables.
+
+You can combine different variables with the following 3 operators:
+
+* "*+*" => Consider multiple variables
+* "*:*" => Consider the interaction between two or more variables
+* "***" => Acts as both *+* and *:*

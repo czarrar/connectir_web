@@ -1,0 +1,85 @@
+---
+layout: base
+title: CWAS - L-dopa
+fixemdash: true
+comments: true
+---
+
+h1. L-dopa: Within-Subjects Design
+
+Here, we investigated brain regions whose connectivity patterns were sensitive to a dopaminergic manipulation: administration of L-dopa vs, placebo in a double-blind study of 19 healthy young adults[1] [2].
+
+p(info). We will not cover all the options for the CWAS commands here, instead please refer to the "CWAS of Age":/doc/cwas/examples/age for a more detailed walk-through.
+
+h2. Subdist
+
+{% highlight bash %}
+connectir_subdist \
+	-c 2 \
+	-t 2 \
+	--memlimit 8 \
+	--ztransform \
+	-i ldopa_funclist.txt \
+	--brainmask gray_4mm_thr25.nii.gz \
+	-m ldopa_masklist.txt \
+	ldopa_subdist
+{% endhighlight %}
+
+h3. -i "ldopa_funclist.txt":ldopa_funclist.txt
+
+Each line in this "file":ldopa_funclist.txt corresponds to one pre-processed dataset in standard space (4x4x4mm). Since each participant was scanned twice (once after taking L-dopa and once after taking a placebo), there are two scans per participants.
+
+h3. -m "ldopa_masklist.txt":ldopa_masklist.txt
+
+Each line in this "file":ldopa_masklist.txt corresponds to one participant's brain mask (i.e., voxels that have non-zero values in the functional data). The number and order of participant's data in this file is the same as in "ldopa_funclist.txt":ldopa_funclist.txt.
+
+h3. ldopa_subdist
+
+The output directory for this script.
+
+h2. MDMR
+
+{% highlight bash %}
+connectir_mdmr \
+	-c 2 \
+	-t 2 \
+	--memlimit 8 \
+	-i ldopa_subdist \
+	-m ldopa_model.csv \
+	-p 9999 \
+	-f "condition + subject" \
+	--factors2perm condition \
+	mdmr_output
+{% endhighlight %}
+
+h3. -i ldopa_subdist
+
+Input directory (i.e., the output specified with connectir_subdist).
+
+h3. -m "ldopa_model.csv":ldopa_model.csv
+
+"Comma-separated file":ldopa_model.csv with information about the subject ID and the scan condition (L-dopa or placebo). The first line is a header and specifies the name for each column. Each subsequent line contains information for one scan and the order of the scans is the same as "ldopa_funclist.txt":ldopa_funclist.txt and "ldopa_masklist.txt":ldopa_masklist.txt, which were specified with the -i and -m options (respectively) in connectir_subdist. For instance, if we look at the first 3 lines of "ldopa_model.csv":ldopa_model.csv:
+
+bq.. subject,condition
+s1,ldopa
+s1,placebo
+
+p. From this file, we can see that the first functional scan specified in "ldopa_funclist.txt":ldopa_funclist.txt is from the 1st participant after they had been administered L-dopa. The second functional scan is also from the 1st participant but after they had been administered a placebo. Note that there the subject starts with a character 's'. Make sure that when you specify your subject ids in a similar .csv file, you start your subject ids with some character. Otherwise if you just have numbers, R will interpret this column as a continuous variable and that is not what we want.
+
+h3. -f "condition + subject"
+
+We want to model the effects of our pharmacological manipulation (condition) and within-subjects effect of 2 scans per participant (subject).
+
+h3. --factors2perm condition
+
+We will only calculate significance for the condition effects.
+
+h3. mdmr_output
+
+Output for this analysis. Note that this directory will be put inside the ldopa_subdist directory so you cannot specify an absolute path here.
+
+h2. Footnotes
+
+fn1. "International Neuroimaging Data-Sharing Initiative":http://fcon_1000.projects.nitrc.org
+
+fn2. Shehzad Z, Kelly C, Reiss PT, Emerson JW, McMahon K, Copland DA, Castellanos FX, Milham MP. An Analytic Framework for Connectome-Wide Association Studies. Submitted.

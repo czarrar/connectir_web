@@ -1,0 +1,155 @@
+---
+layout: base
+title: CWAS - Age
+fixemdash: true
+comments: true
+---
+
+h1. Age
+
+Here, we aim to discover brain regions whose connectivity patterns changed in accordance with age controlling for gender and type of imaging sequence (single-short or multi-shot)[1]. We used a dataset of 96 healthy individuals ranging from 7-25, using a publicly available dataset [2].
+
+h2. Subdist
+
+{% highlight bash %}
+connectir_subdist \
+	-c 2 \
+	-t 2 \
+	--memlimit 12 \
+	--ztransform \
+	-i age_funclist.txt \
+	--brainmask gray_4mm_thr25.nii.gz \
+	-m age_masklist.txt \
+	age_subdist
+{% endhighlight %}
+
+At each voxel, we are (1) computing a whole-brain correlation map for each participant, and (2) comparing the distance between correlation maps for every pair of participants. Let's go through this command in more detail one argument/option at a time.
+
+h3. -c 2
+
+Number of processors to use in parallel.
+
+h3. -t 2
+
+Number of processors to use in parallel for matrix algebra operations (assuming you have Intel's MKL setup).
+
+h3. --memlimit 12
+
+Maximum amount of RAM to use.
+
+h3. --ztransform
+
+Compute a Fischer's Z-transform of each correlation. Note that this doesn't convert a correlation value to a Z-score, which would also require to divide by the square root of n - 1.
+
+h3. -i age_funclist.txt
+
+Each line in this file corresponds to one participant's pre-processed data in standard space (4x4x4mm).
+
+"FILE: age_funclist.txt":age_funclist.txt
+
+bq.. /path/to/...
+
+h3. --brainmask gray_4mm_thr25.nii.gz
+
+Using a mask (in the same space as our functional data) to only include gray matter voxels. This mask was created by taking tissue priors that come with FSL and thresholding it at 25%.
+
+h3. -m age_masklist.txt
+
+Each line in this file corresponds to one participant's brain mask (i.e., voxels that have non-zero values in the functional data). The number and order of participant's data in this file is the same as in age_funclist.txt.
+
+"FILE: age_masklist.txt":age_masklist.txt
+
+bq.. /path/to/...
+
+h3. age_subdist
+
+This is the output directory for this script. This can be an absolute or relative path. The output includes the following directories/files:
+
+* *input_funcs*: Directory that has soft links to all the files in age_funclist.txt.
+* *input_masks*: Directory that has various masks.
+** *preseedmask.nii.gz*: If you specified a seedmask, then this is that. In this example, there was no seedmask so this will not be present in the output.
+** *prebrainmask.nii.gz*: If you specified a brainmask, then this is that. In this example, there was a brainmask so this will be gray_4mm_thr25.nii.gz.
+** *maskoverlap.nii.gz*: This is the overlap across all the masks given with "-m age_masklist.txt".
+** *seedmask.nii.gz*: The overlap across the preseedmask and maskoverlap. Since there is no preeseedmask, this is just a copy of the maskoverlap file.
+** *brainmask.nii.gz*: The overlap across the prebrainmask and maskoverlap files.
+* *subdist.desc* & *subdist.bin*: The .desc file contains header information and the .bin file contains distance matrices for each voxel. You can load this in R using the _attach.big.matrix_ function in R (from the bigmemory package).
+* *subdist_gower.desc* & *subdist_gower.bin*: These files also represent distance matrices for each voxel but the distance matrices have been centered around the origin (i.e., the sum of each distance matrix equals 0).
+* *standard_2mm.nii.gz* & *standard_4mm.nii.gz*: 2x2x2mm and 4x4x4mm MNI152 brains.
+
+h2. MDMR
+
+{% highlight bash %}
+connectir_mdmr \
+	-c 2 \
+	-t 2 \
+	--memlimit 12 \
+	-i age_subdist \
+	-m age_model.csv \
+	-p 9999 \
+	-f "Age + Gender + Wave" \
+	--factors2perm Age \
+	mdmr_output
+{% endhighlight %}
+
+At each voxel, we are taking the distances between participants (i.e., the distance matrix) computed from the previous step and testing how well Age explains the distances between participants.
+
+h3. -c 2
+
+Number of processors to use in parallel.
+
+h3. -t 2
+
+Number of processors to use in parallel for matrix algebra operations (assuming you have Intel's MKL setup).
+
+h3. --memlimit 12
+
+Maximum amount of RAM to use.
+
+h3. -i age_subdist
+
+Input directory (i.e., the output specified with connectir_subdist).
+
+h3. -m age_model.csv
+
+Comma-separated file with information about age, gender, and acquisition type for each participant. The first line is a header and specifies the name for each column. Each subsequent line contains information for one participant and the order of the participants is the same as age_funclist.txt and age_masklist.txt, which were specified with the -i and -m options (respectively) in connectir_subdist.
+
+"FILE: age_model.csv":age_model.csv
+
+bq.. TODO: add
+
+p(info). Note that in this age_model.csv file there is also additional information on each participant that we will not be using. The -f option will determine which factors/variables (i.e., columns in the csv file) will be used in our analysis. The --factors2perm option will determine which of those factors will be permuted to determine significance.
+
+h3. -p 10000
+
+Number of permutations.
+
+h3. -f "Age + Gender + Wave"
+
+See how well age, gender, and wave (independently) explain the distances between participants. Note that we will only be determining the significance of the relationship between age and distances (see --factors2perm option below). The other variables (gender and wave) are used as co-variates of non-interest.
+
+h3. --factors2perm Age
+
+Calculate significance for age is the only regressor/variable using permutation testing.
+
+h3. mdmr_output
+
+Output for this analysis. Note that this directory will be put inside the age_subdist directory so you cannot specify an absolute path here.
+
+This output will contain the following files:
+
+* *evs.csv*: The model (hat matrix)
+* *factorinfo.txt*: This shows all the factors included in the model as well as just those that were permuted.
+* *fdr...*: Ignore these files.
+* *formula.txt*: Contains the formula you entered in the initial command.
+* *fperms_Group.desc* & *fperms_Group.bin*: A matrix containing all the F-statistics at each voxel for each permutation. Rows = permutations; Columns = voxels.
+* *modelinfo.rda*: An R list that contains various useful things used in the MDMR analysis (in R, you would use _load('modelinfo.rda')_).
+* *pvals_XXX.nii.gz*: "1 - p" for XXX factor.
+* *residuals.2D*: This is IH and not really residuals...I shouldn't have named it as such (see Reiss et al., 2010).
+* *zstats_XXX.nii.gz*: Z-score derived from the p-values of XXX factor. Note that since this is a one-tailed test, a Z of 1.65 corresponds to a ==p < 0.05==. For multiple comparisons correction, you can use FSL's easythresh or AFNI's 3dClustSim. At some point, I will add code for multiple comparisons within connectir.
+
+
+h2. Footnotes
+
+fn1. Shehzad Z, Kelly C, Reiss PT, Emerson JW, McMahon K, Copland DA, Castellanos FX, Milham MP. An Analytic Framework for Connectome-Wide Association Studies. Submitted.
+
+fn2. "International Neuroimaging Data-Sharing Initiative":http://fcon_1000.projects.nitrc.org

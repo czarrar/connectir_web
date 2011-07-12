@@ -1,0 +1,79 @@
+---
+layout: base
+title: CWAS - IQ
+fixemdash: true
+comments: true
+---
+
+h1. IQ
+
+Here, we investigated brain regions whose connectivity patterns varied in accordance with full-scale IQ, using a dataset of 53 healthy young adults with IQ scores ranging from 86-129[1] [2].
+
+p(info). We will not cover all the options for the CWAS commands here, instead please refer to the "CWAS of Age":/doc/cwas/examples/age for a more detailed walk-through.
+
+h2. Subdist
+
+{% highlight bash %}
+connectir_subdist \
+	-c 2 \
+	-t 2 \
+	--memlimit 8 \
+	--ztransform \
+	-i iq_funclist.txt \
+	--brainmask gray_4mm_thr25.nii.gz \
+	-m iq_masklist.txt \
+	iq_subdist
+{% endhighlight %}
+
+h3. -i "iq_funclist.txt":iq_funclist.txt
+
+Each line in this "file":iq_funclist.txt corresponds to one participant's pre-processed data in standard space (4x4x4mm).
+
+h3. -m "iq_masklist.txt":iq_masklist.txt
+
+Each line in this "file":iq_masklist.txt corresponds to one participant's brain mask (i.e., voxels that have non-zero values in the functional data). The number and order of participant's data in this file is the same as in "iq_funclist.txt":iq_funclist.txt.
+
+h3. iq_subdist
+
+The output directory for this script.
+
+h2. MDMR
+
+{% highlight bash %}
+connectir_mdmr \
+	-c 2 \
+	-t 2 \
+	--memlimit 8 \
+	-i iq_subdist \
+	-m iq_model.csv \
+	-p 9999 \
+	-f "IQ + Age + Gender + Eyes" \
+	--factors2perm IQ \
+	mdmr_output
+{% endhighlight %}
+
+h3. -i iq_subdist
+
+Input directory (i.e., the output specified with connectir_subdist).
+
+h3. -m "iq_model.csv":iq_model.csv
+
+"Comma-separated file":iq_model.csv with information about age, gender, IQ, and resting scan instructions (eyes open or closed) for each participant. The first line is a header and specifies the name for each column. Each subsequent line contains information for one participant and the order of the participants is the same as "iq_funclist.txt":iq_funclist.txt and "iq_masklist.txt":iq_masklist.txt, which were specified with the -i and -m options (respectively) in connectir_subdist.
+
+h3. -f "IQ + Age + Gender + Eyes"
+
+See how well IQ, age, gender, and scan instructions (independently) explain the distances between participants. Note that we will only be determining the significance of the relationship between IQ and distances (see --factors2perm below) while controlling for age, gender, and scan instructions.
+
+h3. --factors2perm IQ
+
+Calculate significance for IQ (and not for the other factors specified with the -f option). This implies that at each voxel, we will be testing how well individual differences in IQ explain individuals differences in a given voxel's whole-brain connectivity pattern (relative to chance).
+
+h3. mdmr_output
+
+Output for this analysis. Note that this directory will be put inside the iq_subdist directory so you cannot specify an absolute path here.
+
+h2. Footnotes
+
+fn1. "International Neuroimaging Data-Sharing Initiative":http://fcon_1000.projects.nitrc.org
+
+fn2. Shehzad Z, Kelly C, Reiss PT, Emerson JW, McMahon K, Copland DA, Castellanos FX, Milham MP. An Analytic Framework for Connectome-Wide Association Studies. Submitted.

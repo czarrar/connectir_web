@@ -1,3 +1,11 @@
+CONTENT:
+- add examples -> first based on poster / paper
+- finish making the download page
+- update the publications section with appropriate links
+- create an FAQ page (maybe add a form post?) - or add a disqus thing - or http://www.foxyform.com/
+- make .htaccess so index.html are re-written...
+
+DESIGN:
 - make search box and button prettier
 - have jquery code to expand code box if needed to fit content
-- 
+- make something for div class='footnotes'
