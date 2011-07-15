@@ -150,6 +150,6 @@ This output will contain the following files:
 
 h2. Footnotes
 
-fn1. Shehzad Z, Kelly C, Reiss PT, Emerson JW, McMahon K, Copland DA, Castellanos FX, Milham MP. An Analytic Framework for Connectome-Wide Association Studies. Submitted.
+fn1. Shehzad Z, Kelly C, Reiss PT, Emerson JW, McMahon K, Copland DA, Castellanos FX, Milham MP. An Analytic Framework for Connectome-Wide Association Studies. Under Review.
 
 fn2. "International Neuroimaging Data-Sharing Initiative":http://fcon_1000.projects.nitrc.org

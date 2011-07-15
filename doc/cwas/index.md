@@ -15,5 +15,5 @@ The [examples page](/doc/cwas/examples) contains how CWAS was conducted for each
 
 If you find these scripts useful for your research, please consider citing our forthcoming paper:
 
-> Shehzad Z, Kelly C, Reiss PT, Emerson JW, McMahon K, Copland DA, Castellanos FX, Milham MP. An Analytic Framework for Connectome-Wide Association Studies. Submitted.
+> Shehzad Z, Kelly C, Reiss PT, Emerson JW, McMahon K, Copland DA, Castellanos FX, Milham MP. An Analytic Framework for Connectome-Wide Association Studies. Under Review.
 

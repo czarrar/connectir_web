@@ -76,4 +76,4 @@ h2. Footnotes
 
 fn1. "International Neuroimaging Data-Sharing Initiative":http://fcon_1000.projects.nitrc.org
 
-fn2. Shehzad Z, Kelly C, Reiss PT, Emerson JW, McMahon K, Copland DA, Castellanos FX, Milham MP. An Analytic Framework for Connectome-Wide Association Studies. Submitted.
+fn2. Shehzad Z, Kelly C, Reiss PT, Emerson JW, McMahon K, Copland DA, Castellanos FX, Milham MP. An Analytic Framework for Connectome-Wide Association Studies. Under Review.
