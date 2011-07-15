@@ -53,6 +53,8 @@ h3. --brainmask gray_4mm_thr25.nii.gz
 
 Using a mask (in the same space as our functional data) to only include gray matter voxels. This mask was created by taking tissue priors that come with FSL and thresholding it at 25%.
 
+If you want a copy of this gray matter mask, "click here":/etc/rois and you shall be happy.
+
 h3. -m age_masklist.txt
 
 Each line in this file corresponds to one participant's brain mask (i.e., voxels that have non-zero values in the functional data). The number and order of participant's data in this file is the same as in age_funclist.txt.

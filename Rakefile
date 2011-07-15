@@ -21,7 +21,7 @@ end
 desc 'Build, deploy, and commit/push'
 task :commit, :message do |t, args|
   msg = args[:message]
-  Rake::Task['deploy'].invoke
+#  Rake::Task['deploy'].invoke
   sh "git commit -m '#{msg}'"
   sh 'git push'
 end

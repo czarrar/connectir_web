@@ -113,6 +113,8 @@ h3. --brainmask=FILE
 
 When computing connectivity maps for each voxel, you can specify an additional mask (on top of what is given with the -m option) that further restricts the voxels considered. This mask must be in the same space as those specified with the -m option. For instance, I often use a gray matter mask based on priors given with FSL. _Note_: voxels that overlap between this mask and all those given with the '-m' option will be used.
 
+If you want a copy of the gray matter masks that I have used, "click here":/etc/rois and you shall be happy.
+
 *Default*: Nothing.
 
 h3. --seedmask=FILE
