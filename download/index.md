@@ -54,7 +54,7 @@ You will need to first install the Intel MKL library. A [free non-commercial ver
 After you get the library, we will assume that it is installed in `/opt/intel/composerxe`. You can substitute this path as required. You will need to have the MKL library in your system library path. Run the following line in your terminal window and also add it to your .profile, .bashrc, or .bash_profile in your home directory ($HOME).
 
 {% highlight bash %}
-export LD_LIBRARY_PATH=/opt/intel/composerxe/mkl/lib/intel64
+export LD_LIBRARY_PATH=/opt/intel/composerxe/mkl/lib/intel64:$LD_LIBRARY_PATH
 {% endhighlight %}
 
 Download the bigalgebra source code at https://r-forge.r-project.org/R/?group_id=556. Decompress the downloaded folder and in your terminal window navigate to this folder. Now enter the following 2 commands:
@@ -62,17 +62,17 @@ Download the bigalgebra source code at https://r-forge.r-project.org/R/?group_id
 {% highlight bash %}
 MKL_DIR=/opt/intel/composerxe/mkl
 
-R CMD INSTALL --configure-args='
-	--with-incDir="-DMKL_ILP64 -I${MKL_DIR}/include"
-	--with-blasHeader="mkl.h"
-	--with-blas="-L${MKL_DIR}/lib/intel64/
+R CMD INSTALL --configure-args="
+	--with-incDir='-DMKL_ILP64 -I${MKL_DIR}/include' 
+	--with-blasHeader='mkl.h'
+	--with-blas='-L${MKL_DIR}/lib/intel64/
 		-lmkl_gf_ilp64 -lmkl_core -lmkl_def
-		-lmkl_gnu_thread -lgomp"
-	--with-lapack="-L${MKL_DIR}/intel64/
+		-lmkl_gnu_thread -lgomp'
+	--with-lapack='-L${MKL_DIR}/lib/intel64/
 		-lmkl_gf_ilp64 -lmkl_core -lmkl_def
-		-lmkl_gnu_thread -lgomp"
-	--with-lapackHeader="mkl.h"
-	--with-int64="long long"' bigalgebra
+		-lmkl_gnu_thread -lgomp'
+	--with-lapackHeader='mkl.h'
+	--with-int64='long long'" bigalgebra
 {% endhighlight %}
 
 ## Connectir and Related Packages
